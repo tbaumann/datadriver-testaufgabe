@@ -1,0 +1,36 @@
+name: "Deploy"
+on: [push]
+  push:
+    branches:
+      - stable
+jobs:
+  example:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download Terraform state
+        uses: devgioele/terraform-state-artifact@v4
+        with:
+          passphrase: ${{ secrets.TF_STATE_PASSPHRASE }}
+          download_upload: download
+
+      - uses: cachix/install-nix-action@v18
+      - uses: rrbutani/use-nix-shell-action@v1
+        with:
+          devShell: .#
+          interpreter: bash
+          clearEnvForScript: false
+          script: |
+            # use strict
+            set -e
+            set -u
+            set -o pipefail
+
+            env
+            cd terraform
+            terraform init
+      - name: Upload Terraform state
+        uses: devgioele/terraform-state-artifact@v4
+        with:
+          passphrase: ${{ secrets.TF_STATE_PASSPHRASE }}
+          download_upload: upload
