@@ -20,7 +20,7 @@ locals {
 
 
 module "vpc" {
-  source  = "terraform-aws-modules/vpc/aws"
+  source = "terraform-aws-modules/vpc/aws"
   #version = "5.8.1"
 
   name = "datadrvers-vpc"
@@ -45,7 +45,7 @@ module "vpc" {
 }
 
 module "eks" {
-  source  = "terraform-aws-modules/eks/aws"
+  source = "terraform-aws-modules/eks/aws"
   #version = "20.8.5"
 
   cluster_name    = local.cluster_name
@@ -55,7 +55,7 @@ module "eks" {
   enable_cluster_creator_admin_permissions = true
 
   cluster_addons = {
-    coredns = {}
+    coredns    = {}
     kube-proxy = {}
 
     aws-ebs-csi-driver = {
