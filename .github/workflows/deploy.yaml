@@ -1,4 +1,4 @@
-name: Deeploy
+name: Deploy
 
 on:
   workflow_run:
