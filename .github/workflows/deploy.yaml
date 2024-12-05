@@ -59,8 +59,8 @@ jobs:
     - name: Build, tag, and push image to Amazon ECR
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: datadriver_demo_docker
-        IMAGE_TAG: hello_world:${{ github.head_ref || github.ref_name }} 
+        ECR_REPOSITORY: hello_world
+        IMAGE_TAG: ${{ github.head_ref || github.ref_name }} 
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./app/
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG 
