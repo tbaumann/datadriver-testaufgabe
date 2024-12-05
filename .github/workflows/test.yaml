@@ -24,6 +24,7 @@ jobs:
         with:
           passphrase: ${{ secrets.TF_STATE_PASSPHRASE }}
           download_upload: download
+          statefile_location: terraform
         continue-on-error: true
 
       - name: Terraform Init
@@ -32,12 +33,16 @@ jobs:
 
       - name: Terraform Validate
         id: validate
-        run: terraform validate -no-color
+        run: terraform validate 
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -no-color
-        continue-on-error: true
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: terraform apply -auto-approve
+      - name: Find files
+        run: find
 
       - uses: actions/github-script@v7
         if: github.event_name == 'pull_request'
@@ -102,6 +107,8 @@ jobs:
         with:
           passphrase: ${{ secrets.TF_STATE_PASSPHRASE }}
           download_upload: upload
+      - name: Find files again
+        run: gpg
   Docker-Image:
     runs-on: ubuntu-latest
     steps:
