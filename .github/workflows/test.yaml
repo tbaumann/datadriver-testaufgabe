@@ -1,15 +1,15 @@
 name: "Test"
 on: [push]
-env:
   
 jobs:
   Test:
     defaults:
       run:
-        working-directory: ${{ env.tf_actions_working_dir }}
+        working-directory: terraform
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
@@ -19,7 +19,6 @@ jobs:
         run: terraform fmt -check
         continue-on-error: true
 
-      - uses: actions/checkout@v3
       - name: Download Terraform state
         uses: devgioele/terraform-state-artifact@v4
         with:
@@ -107,7 +106,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
