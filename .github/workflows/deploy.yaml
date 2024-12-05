@@ -129,6 +129,7 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
     - name: Set up kubectl
       run: aws eks --region eu-west-03 update-kubeconfig --name datadrivers-demo
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
