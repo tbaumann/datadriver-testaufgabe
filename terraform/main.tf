@@ -18,7 +18,11 @@ locals {
   cluster_name = "datadrivers-demo"
 }
 
+resource "aws_ecr_repository" "datadrivers-demo_docker_image" {
+  name = "datadrivers-dem_docker_image"
+}
 
+/*
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
   #version = "5.8.1"
@@ -110,3 +114,4 @@ module "irsa-ebs-csi" {
   role_policy_arns              = [data.aws_iam_policy.ebs_csi_policy.arn]
   oidc_fully_qualified_subjects = ["system:serviceaccount:kube-system:ebs-csi-controller-sa"]
 }
+*/

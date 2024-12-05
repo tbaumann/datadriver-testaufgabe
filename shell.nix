@@ -3,12 +3,12 @@ with pkgs;
   mkShell {
     buildInputs = [
       awscli2
-      earthly
       envsubst
       k9s
       kubectl
-      openssl
       terraform
+      nodejs_23
+      podman
     ];
 
     shellHook = ''
