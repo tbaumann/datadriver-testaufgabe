@@ -19,7 +19,7 @@ locals {
 }
 
 resource "aws_ecr_repository" "datadrivers-demo_docker_image" {
-  name = "datadrivers-dem_docker_image"
+  name = "datadrivers-demo_docker_image"
 }
 
 /*
