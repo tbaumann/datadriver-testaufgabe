@@ -1,10 +1,9 @@
-name: Deploy
-
+name: "Deploy"
 on:
   workflow_run:
     workflows: [Test]
     types: [completed]
-    branches: [stable]
+    #  branches: [stable]
 
 jobs:
   Terraform-Apply:
