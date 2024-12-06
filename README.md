@@ -66,3 +66,5 @@ The CI/CD pipeline is minimal but functional:
 
 This project prioritizes practicality and speed over perfection. By focusing on the essentials, I could experiment with EKS and set up a working example without getting lost in excessive complexity.  
 
+## Sparse git log ##
+I had to rebase my history a bit because I accidentally committed my `.envrc` with the AWS keys.
