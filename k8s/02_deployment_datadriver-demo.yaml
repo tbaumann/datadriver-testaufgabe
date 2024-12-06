@@ -22,10 +22,11 @@ spec:
         imagePullPolicy: Always
         name: datadriver-demo
         env:
-          KUBERNETES_CONFIG_MOUNT_PATH: /config
+            - name: KUBERNETES_CONFIG_MOUNT_PATH
+              value: /config
         volumeMounts:
           - name: config-volume
-              mountPath: /config
+            mountPath: /config
         ports:
         - containerPort: 8000
           protocol: TCP
