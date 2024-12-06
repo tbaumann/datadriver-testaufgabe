@@ -59,7 +59,7 @@ jobs:
       ## FIXME Cache this
 
   Terraform-Apply:
-    #if: github.ref == 'refs/heads/stable'
+    if: github.ref == 'refs/heads/stable'
     needs: Terraform-Plan
     defaults:
       run:
@@ -84,7 +84,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: terraform apply -auto-approve
   Docker-Image-Push:
-    #if: github.ref == 'refs/heads/stable'
+    if: github.ref == 'refs/heads/stable'
     needs: Docker-Image-Build
     defaults:
       run:
