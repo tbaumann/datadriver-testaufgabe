@@ -6,6 +6,7 @@ with pkgs;
       envsubst
       k9s
       kubectl
+      kubernetes-helm
       terraform
       nodejs_23
       podman

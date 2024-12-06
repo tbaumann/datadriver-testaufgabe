@@ -129,10 +129,12 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
     - name: Set up kubectl
-      run: aws eks --region eu-west-3 update-kubeconfig --name datadrivers-demo
+      run: cd terraform; aws eks --region eu-west-3 update-kubeconfig --name datadrivers-demo
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     - name: Show cluster
       run: kubectl cluster-info
+    - name: Deploy Kubernetes Objects
+      run: kubectl apply -f k8s/
 

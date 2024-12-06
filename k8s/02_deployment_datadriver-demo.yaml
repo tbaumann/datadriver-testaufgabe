@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: datadrivers-demo
+  namespace: datadrivers-demo
+  labels:
+    app: datadrivers-demo
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: datadrivers-demo
+  template:
+    metadata:
+      labels:
+        app: datadrivers-demo
+    spec:
+      containers:
+      - image: 600627322473.dkr.ecr.eu-west-3.amazonaws.com/datadrivers-demo_docker_image:stable
+        name: datadriver-demo
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 15
