@@ -137,4 +137,6 @@ jobs:
       run: kubectl cluster-info
     - name: Deploy Kubernetes Objects
       run: kubectl apply -f k8s/
+    - name: Show Load Balancer
+      run:  kubectl get service  -n datadrivers-demo datadrivers-demo-lb
 
