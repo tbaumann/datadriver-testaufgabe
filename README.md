@@ -1,41 +1,68 @@
-# Datadrivers Testaufgabe #
+# Datadrivers Test Task #
 
-This is quite frankly pretty minimal effort. But EKS was new to me and I didn't feel like going too deep that rabbit hole.
+This repository showcases a minimal example project. While the implementation is intentionally kept simple, it demonstrates my approach to exploring new technologies—specifically, Amazon EKS.
 
-## The app ##
-Really minimalist Express app that prints hello world
+## The App ##
+
+The application is a minimalist Express.js app that responds with "Hello, World."  
+
+- **Configuration**: The app reads `name` and `port` values from a ConfigMap mounted at `/config`. The ConfigMap can be updated at runtime to adjust the app's behavior without redeployment.  
+- **Endpoints**:  
+  - `/ready`: Simulates a slow startup, which is useful for readiness probes.  
+  - `/live`: Always returns `HTTP: 200`
+  - `/`: Greets back `user` 
 
 ## Docker ##
 
-I hate how the app is built. The determinism of the build is a joke. But I didn't want to waste too much time making it nice with Nix.
-
-If it's good enough for industry practice it's  good enough for this. :D
+The current Docker setup is functional but leaves room for improvement:  
+- The build process lacks determinism, which I could address with Nix.  
+- For this exercise, I opted for simplicity rather than perfecting the Docker image.  
 
 ## EKS and ECR ## 
-Amazon resrources are deployed via Terraform. Terraform uses a s3 bucket as storage location so that it has the state in a central location. Otherwise deployment via pipeline would be very problematic.
 
-The EKS code is 100% lifted from  https://github.com/hashicorp-education/learn-terraform-provision-eks-cluster and https://developer.hashicorp.com/terraform/tutorials/aws/eks
-I EKS is new to me, I didn't want to spend my time finding out the basiscs.
+AWS resources are provisioned using Terraform:  
+- **State Management**: Terraform uses an S3 bucket for storing the state, enabling centralized state management and pipeline-friendly deployments.  
+- **Cluster Setup**: The EKS Terraform configuration is entirely stolen from [Learn Terraform - Provision an EKS Cluster](https://github.com/hashicorp-education/learn-terraform-provision-eks-cluster) [Terraform EKS Tutorial](https://developer.hashicorp.com/terraform/tutorials/aws/eks)  
+
+EKS was new to me, so I focused on gettint it work instead of full comprehension. As anything AWS the complexity is horrendeus.
 
 ## Kubernetes ##
-I didn't use Helm or anything fancy. Just a bunch of hardcoded yaml files. I dislike Helm for basically being a text templating engine that's being used for data manipulation anyway.
-I guess if I had a need for customisations Kustomize is the reasonable choice. Or Cue.
+
+For Kubernetes manifests:  
+- I used plain YAML files without tools like Helm, as I find Helm's templating approach too text-oriented for structured data manipulation.  
+- If customizations were needed, tools like Kustomize or Cue would be my preferred alternatives.
 
 ## Ingress ##
-EKS clusters don't have a default Ingress Controller. ALB looks like a good choice, but deploying that looked awful. 
 
-I'm using a `LoadBalancer` now, ELB are expensive and kind of dumb. But it works out of the box.
+EKS clusters do not include a default Ingress Controller:  
+- **Options Considered**:  
+  - ALB is an obvious choice. But it was far from straight forward to deploy.
+  - I opted for a `LoadBalancer` service. While Elastic Load Balancers (ELBs) can be expensive and rudimentary, this setup works out of the box for this example.  
 
 ## Pipeline ##
-Pretty much minimal low effort I admit. But it gets the job done. Merge in the `stable` branch and stuff gets deployed. All other git refs only run the test steps.
 
-This is whre I see the most improvements.
+The CI/CD pipeline is minimal but functional:  
+- **Workflow**:  
+  - Merging to the `stable` branch triggers deployment to the cluster.  
+  - Other branches and git references run tests only.  
 
-First of all, again all the tooling is non deterministic. I did use Nix a bit but it was slowing me down.
-This isn't the kind of project that will break if tools upate, but it feels dirty.
+### Potential Improvements ###
 
-The biggest missing feature is staging. Right now there is only one instance of the cluster and the application and that is in the `stable` branch.
-Better would be a structure like `deploy/test`, `deploy/stage`, `deploy/release` or something like that. All with their own deployment.
+1. **Staging Environment**:  
+   - Currently, there is only one environment (`stable`) for deployment.  
+   - A more robust setup would include separate environments, e.g., `test`, `stage`, and `release`, each with its own cluster and application instance.
 
-There is no test of the deployed cluster and app.
+2. **Tooling Determinism**:  
+   - While I experimented with Nix, I ultimately deprioritized it to save time. I love it, but having the ready made GitHub Actions was nice to have.
+   - This project isn’t highly sensitive to tool updates, so making this nicer isn't really worth it except for coolness and personal principles.
+
+3. **End-to-End Tests**:  
+   - Currently, there are no tests for the deployed cluster or application. If it deploys it works. 
+   - Adding automated tests for the deployment and application behavior would increase confidence in the pipeline.  (Especially with staging)
+
+---
+
+### Why This Approach? ###
+
+This project prioritizes practicality and speed over perfection. By focusing on the essentials, I could experiment with EKS and set up a working example without getting lost in excessive complexity.  
 
