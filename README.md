@@ -9,8 +9,8 @@ The application is a minimalist Express.js app that responds with "Hello, World.
 - **Configuration**: The app reads `name` and `port` values from a ConfigMap mounted at `/config`. The ConfigMap can be updated at runtime to adjust the app's behavior without redeployment.  
 - **Endpoints**:  
   - `/ready`: Simulates a slow startup, which is useful for readiness probes.  
-  - `/live`: Always returns `HTTP: 200`
-  - `/`: Greets back `user` 
+  - `/live`: Always returname `HTTP: 200`
+  - `/`: Greets back `name` 
 
 ## Docker ##
 
