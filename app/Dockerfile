@@ -1,6 +1,6 @@
 FROM node:23
 EXPOSE 8000/tcp
-HEALTHCHECK CMD curl -f http://localhost:8000/ || exit 1
+HEALTHCHECK CMD curl -f http://localhost:8000/live || exit 1
 
 WORKDIR /usr/src/app
 

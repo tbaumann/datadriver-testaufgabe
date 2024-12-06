@@ -4,12 +4,14 @@
   "description": "Hello World Webserver",
   "main": "app.js",
   "scripts": {
+    "mon": "KUBERNETES_CONFIG_MOUNT_PATH=./conf nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Tilman Baumann",
   "license": " MIT-0",
   "dependencies": {
     "express": "^4.21.1",
+    "k8s-config": "^1.0.9",
     "node2nix": "^1.11.0",
     "nodemon": "^3.1.7"
   }

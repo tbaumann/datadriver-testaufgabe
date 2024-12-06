@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: datadriver-demo-helloworld-config
+  namespace: datadrivers-demo
+data:
+  name: Datadriver
