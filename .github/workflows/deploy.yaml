@@ -13,10 +13,6 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-      - name: Summary
-        run: |
-          echo "# Build Summary #" > $GITHUB_STEP_SUMMARY
-          echo " Wait for end of pipeline..." >> $GITHUB_STEP_SUMMARY
       - uses: hashicorp/setup-terraform@v3
       - name: Terraform Init
         id: init
