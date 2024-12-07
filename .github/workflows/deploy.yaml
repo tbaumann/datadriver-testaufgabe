@@ -12,6 +12,10 @@ jobs:
       pull-requests: write
       contents: read
     steps:
+      - name: Summary
+        run: |
+          echo "# Build Summary #" > $GITHUB_STEP_SUMMARY
+          echo " Wait for end of pipeline..." >> $GITHUB_STEP_SUMMARY
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
       - name: Terraform Init
@@ -130,7 +134,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
       - name: Set up kubectl
-        run: cd terraform; aws eks --region eu-west-3 update-kubeconfig --name datadrivers-demo
+        run: cd terraform; aws eks --region $(terraform output -raw region) update-kubeconfig   --name $(terraform output -raw cluster_name)
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -139,12 +143,12 @@ jobs:
       - name: Deploy Kubernetes Objects
         run: kubectl apply -f k8s/
       - name: Show Load Balancer
-        if: get-lb
+        id: getlb
         run: |
           RESULT=$(kubectl get services -n datadrivers-demo datadrivers-demo-lb --output jsonpath='{.status.loadBalancer.ingress[0].hostname}')
           echo $RESULT
           echo "lb=$RESULT" >> $GITHUB_OUTPUT
       - name: Summary
         run: |
-          echo "# Build Summary #" >> $GITHUB_STEP_SUMMARY
-          echo "App endpoint: [${{ steps.get-lb.outputs.name }}](http:/${{ steps.get-lb.outputs.name }}/)" > $GITHUB_STEP_SUMMARY
+          echo "# Build Summary #" > $GITHUB_STEP_SUMMARY
+          echo "App endpoint: [${{ steps.getlb.outputs.lb }}](http:/${{ steps.getlb.outputs.lb }}/)" > $GITHUB_STEP_SUMMARY
