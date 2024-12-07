@@ -12,7 +12,6 @@
   "dependencies": {
     "express": "^4.21.1",
     "k8s-config": "^1.0.9",
-    "node2nix": "^1.11.0",
     "nodemon": "^3.1.7"
   }
 }
