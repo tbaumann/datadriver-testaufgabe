@@ -55,6 +55,7 @@ The CI/CD pipeline is minimal but functional:
 2. **Tooling Determinism**:  
    - While I experimented with Nix, I ultimately deprioritized it to save time. I love it, but having the ready made GitHub Actions was nice to have.
    - This project isn’t highly sensitive to tool updates, so making this nicer isn't really worth it except for coolness and personal principles.
+   - I like this solution https://determinate.systems/posts/nix-github-actions/
 
 3. **End-to-End Tests**:  
    - Currently, there are no tests for the deployed cluster or application. If it deploys it works. 
