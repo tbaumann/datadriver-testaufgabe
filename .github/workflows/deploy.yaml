@@ -3,157 +3,42 @@ name: "Deploy"
 on: [push]
 
 jobs:
-  Terraform-Plan:
+  Run:
     defaults:
-      run:
-        working-directory: terraform
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
-      pull-requests: write
       contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
-      - name: Terraform Init
-        id: init
-        run: terraform init
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate
-      - name: Terraform Plan
-        id: plan
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: terraform plan
-
-  Docker-Image-Build:
-    defaults:
-      run:
-        working-directory: app
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Check Nixpkgs inputs
+        uses: DeterminateSystems/flake-checker-action@main
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-west-3
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Build, tag, and push image to Amazon ECR
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: datadrivers-demo_docker_image
-          IMAGE_TAG: ${{ github.head_ref || github.ref_name }}
+          fail-mode: true
+      - name: Run CI Script
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        ## FIXME Cache this
-
-  Terraform-Apply:
-    if: github.ref == 'refs/heads/stable'
-    needs: Terraform-Plan
-    defaults:
-      run:
-        working-directory: terraform
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-      - uses: hashicorp/setup-terraform@v3
-      - name: Terraform Init
-        id: init
-        run: terraform init
+          if [ stable = "${{ github.head_ref || github.ref_name }}" ]
+          then
+            nix develop --command ci-local -t ${{ github.head_ref || github.ref_name }} -d
+          else
+            nix develop --command ci-local -t ${{ github.head_ref || github.ref_name }}
+          fi
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: Terraform Apply
-        id: apply
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: terraform apply -auto-approve
-  Docker-Image-Push:
-    if: github.ref == 'refs/heads/stable'
-    needs: Docker-Image-Build
-    defaults:
-      run:
-        working-directory: app
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-west-3
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Build, tag, and push image to Amazon ECR
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: datadrivers-demo_docker_image
-          IMAGE_TAG: ${{ github.head_ref || github.ref_name }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-  K8s:
-    needs: [Docker-Image-Push, Terraform-Apply]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-      - uses: hashicorp/setup-terraform@v3
-      - name: Terraform Init
-        id: init
-        run: cd terraform; terraform init
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-west-3
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          mask-password: 'true'
-      - name: Set up kubectl
-        run: cd terraform; aws eks --region $(terraform output -raw region) update-kubeconfig   --name $(terraform output -raw cluster_name)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: Show cluster
-        run: kubectl cluster-info
-      - name: Deploy Kubernetes Objects
-        run: kubectl apply -f k8s/
       - name: Show Load Balancer
         id: getlb
+        if: github.ref == 'refs/heads/stable'
         run: |
-          RESULT=$(kubectl get services -n datadrivers-demo datadrivers-demo-lb --output jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+          RESULT=$(nix develop --command kubectl get services -n datadrivers-demo datadrivers-demo-lb --output jsonpath='{.status.loadBalancer.ingress[0].hostname}')
           echo $RESULT
           echo "lb=$RESULT" >> $GITHUB_OUTPUT
       - name: Summary
+        if: github.ref == 'refs/heads/stable'
         run: |
           echo "# Build Summary #" > $GITHUB_STEP_SUMMARY
           echo "App endpoint: [${{ steps.getlb.outputs.lb }}](http:/${{ steps.getlb.outputs.lb }}/)" > $GITHUB_STEP_SUMMARY
+
