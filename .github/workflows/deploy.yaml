@@ -21,9 +21,9 @@ jobs:
         run: |
           if [ -n "$STAGE" ]
           then
-            nix develop --command ci-local -t $STAGE -d
+            nix develop --command ci-local -s $STAGE -d
           else
-            nix develop --command ci-local -t ${{ github.head_ref || github.ref_name }}
+            nix develop --command ci-local -s ${{ github.head_ref || github.ref_name }}
           fi
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
