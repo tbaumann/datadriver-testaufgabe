@@ -94,8 +94,8 @@
             f [ -n "$GITHUB_STEP_SUMMARY" ]
             then
               echo  -e "\e[1;34mSummary\e[0m"
-              echo "# Build Summary #" > $GITHUB_STEP_SUMMARY
-              echo "App endpoint: [$endpoint](http://$endpoint)" > $GITHUB_STEP_SUMMARY
+              echo "# Build Summary " >> $GITHUB_STEP_SUMMARY
+              echo "App endpoint: [$endpoint](http://$endpoint)" >> $GITHUB_STEP_SUMMARY
             fi
           fi
         '';
