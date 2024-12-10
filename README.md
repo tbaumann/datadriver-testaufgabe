@@ -2,6 +2,10 @@
 
 This repository showcases a minimal example project. While the implementation is intentionally kept simple, it demonstrates my approach to exploring new technologies—specifically, Amazon EKS.
 
+
+[![dev](https://github.com/tbaumann/datadriver-testaufgabe/actions/workflows/deploy.yaml/badge.svg?branch=releases%2Fdev)](https://github.com/tbaumann/datadriver-testaufgabe/actions/workflows/deploy.yaml)
+[![prod](https://github.com/tbaumann/datadriver-testaufgabe/actions/workflows/deploy.yaml/badge.svg?branch=releases%2Fprod)](https://github.com/tbaumann/datadriver-testaufgabe/actions/workflows/deploy.yaml)
+
 ## The App ##
 
 The application is a minimalist Express.js app that responds with "Hello, World."  
@@ -48,16 +52,7 @@ The CI/CD pipeline is minimal but functional:
 
 ### Potential Improvements ###
 
-1. **Staging Environment**:  
-   - Currently, there is only one environment (`stable`) for deployment.  
-   - A more robust setup would include separate environments, e.g., `test`, `stage`, and `release`, each with its own cluster and application instance.
-
-2. **Tooling Determinism**:  
-   - While I experimented with Nix, I ultimately deprioritized it to save time. I love it, but having the ready made GitHub Actions was nice to have.
-   - This project isn’t highly sensitive to tool updates, so making this nicer isn't really worth it except for coolness and personal principles.
-   - I like this solution https://determinate.systems/posts/nix-github-actions/
-
-3. **End-to-End Tests**:  
+1. **End-to-End Tests**:  
    - Currently, there are no tests for the deployed cluster or application. If it deploys it works. 
    - Adding automated tests for the deployment and application behavior would increase confidence in the pipeline.  (Especially with staging)
 
