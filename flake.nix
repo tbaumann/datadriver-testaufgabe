@@ -91,7 +91,7 @@
             kubectl wait  -n datadrivers-demo --for=jsonpath='{.status.loadBalancer.ingress[0].hostname}' service/datadrivers-demo-lb
             endpoint=$(kubectl get services -n datadrivers-demo datadrivers-demo-lb --output jsonpath='{.status.loadBalancer.ingress[0].hostname}')
             echo App Endpoint: $endpoint
-            f [ -n "$GITHUB_STEP_SUMMARY" ]
+            if [ -n "$GITHUB_STEP_SUMMARY" ]
             then
               echo  -e "\e[1;34mSummary\e[0m"
               echo "# Build Summary " >> $GITHUB_STEP_SUMMARY
