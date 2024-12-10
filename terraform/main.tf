@@ -15,18 +15,17 @@ data "aws_availability_zones" "available" {
 }
 
 locals {
-  cluster_name = "datadrivers-demo"
+  cluster_name = "datadrivers-demo-${var.stage}"
 }
 
 resource "aws_ecr_repository" "datadrivers-demo_docker_image" {
-  name = "datadrivers-demo_docker_image"
+  name = "datadrivers-demo_docker_image-${var.stage}"
 }
 
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
-  #version = "5.8.1"
 
-  name = "datadrvers-vpc"
+  name = "datadrvers-vpc-${var.stage}"
 
   cidr = "10.0.0.0/16"
   azs  = slice(data.aws_availability_zones.available.names, 0, 3)
@@ -49,9 +48,8 @@ module "vpc" {
 
 module "eks" {
   source = "terraform-aws-modules/eks/aws"
-  #version = "20.8.5"
 
-  cluster_name    = "datadrivers-demo"
+  cluster_name    = "datadrivers-demo-${var.stage}"
   cluster_version = "1.31"
 
   cluster_endpoint_public_access           = true

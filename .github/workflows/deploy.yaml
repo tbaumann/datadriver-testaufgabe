@@ -4,7 +4,6 @@ on: [push]
 
 jobs:
   Run:
-    defaults:
     runs-on: ubuntu-22.04
     permissions:
       contents: read
@@ -20,25 +19,13 @@ jobs:
           fail-mode: true
       - name: Run CI Script
         run: |
-          if [ stable = "${{ github.head_ref || github.ref_name }}" ]
+          if [ -n "$STAGE" ]
           then
-            nix develop --command ci-local -t ${{ github.head_ref || github.ref_name }} -d
+            nix develop --command ci-local -t $STAGE -d
           else
             nix develop --command ci-local -t ${{ github.head_ref || github.ref_name }}
           fi
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: Show Load Balancer
-        id: getlb
-        if: github.ref == 'refs/heads/stable'
-        run: |
-          RESULT=$(nix develop --command kubectl get services -n datadrivers-demo datadrivers-demo-lb --output jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-          echo $RESULT
-          echo "lb=$RESULT" >> $GITHUB_OUTPUT
-      - name: Summary
-        if: github.ref == 'refs/heads/stable'
-        run: |
-          echo "# Build Summary #" > $GITHUB_STEP_SUMMARY
-          echo "App endpoint: [${{ steps.getlb.outputs.lb }}](http:/${{ steps.getlb.outputs.lb }}/)" > $GITHUB_STEP_SUMMARY
-
+          STAGE: ${{ env.STAGE }}
