@@ -18,9 +18,7 @@ The application is a minimalist Express.js app that responds with "Hello, World.
 
 ## Docker ##
 
-The current Docker setup is functional but leaves room for improvement:  
-- The build process lacks determinism, which I could address with Nix.  
-- For this exercise, I opted for simplicity rather than perfecting the Docker image.  
+The App and the Image is built with nix. The docker image with `dockerTools.buildLayeredImage` which builds a compact layered docker image with a high likelyhoood of layers being reusable.
 
 ## EKS and ECR ## 
 
@@ -50,6 +48,44 @@ The CI/CD pipeline is minimal but functional:
   - Merging to the `release/dev` branch triggers deployment to the dev cluster.  
   - Merging to the `release/prod` branch triggers deployment to the prod cluster.  
   - Other branches and git references run tests only.  
+
+Run the pipeline locally with 
+```shell
+export AWS_ACCESS_KEY_ID=...
+export AWS_SECRET_ACCESS_KEY=...
+nix develop --command ci-local -d -s dev
+# -d enables deploy mode. Default is just test.
+# If -s is omitted the git revision is used
+```
+
+## Nix Shell ##
+
+Run `nix develop` to get a shell with all corret tools installed.
+
+`nix flake update` to update pinned package versions.
+
+
+Build outputs for the image and the app are provided by the flake.
+
+```shell
+# Build app
+nix build .#default # Builds a wrapper called result/bin/datadrivers-demo-app
+
+#run app 
+mkdir ./conf 
+export KUBERNETES_CONFIG_MOUNT_PATH=./conf
+nix run 
+#or 
+nix run github.com:tbaumann/datadriver-testaufgabe
+
+#Build docker
+nix build .#docker
+docker load -i result
+
+#or 
+docker load < $(nix-build hello-docker.nix)
+
+```
 
 ### Potential Improvements ###
 
