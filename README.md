@@ -18,7 +18,7 @@ The application is a minimalist Express.js app that responds with "Hello, World.
 
 ## Docker ##
 
-The App and the Image is built with nix. The docker image with `dockerTools.buildLayeredImage` which builds a compact layered docker image with a high likelyhoood of layers being reusable.
+The App and the Image is built with Nix. The docker image with `dockerTools.buildLayeredImage` which builds a compact layered docker image with a high likelyhoood of layers being reusable.
 
 ## EKS and ECR ## 
 
@@ -82,10 +82,6 @@ nix run github.com:tbaumann/datadriver-testaufgabe
 #Build docker
 nix build .#docker
 docker load -i result
-
-#or 
-docker load < $(nix-build hello-docker.nix)
-
 ```
 
 ### Potential Improvements ###
