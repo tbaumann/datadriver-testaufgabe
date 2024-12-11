@@ -33,6 +33,7 @@ EKS was new to me, so I focused on gettint it work instead of full comprehension
 For Kubernetes manifests:  
 - I used plain YAML files without tools like Helm, as I find Helm's templating approach too text-oriented for structured data manipulation.  
 - If customizations were needed, tools like Kustomize or Cue would be my preferred alternatives.
+- I just use `envsubst` to replace the image name in the deployment.
 
 ## Ingress ##
 
