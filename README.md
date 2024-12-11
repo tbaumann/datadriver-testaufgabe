@@ -47,7 +47,8 @@ EKS clusters do not include a default Ingress Controller:
 
 The CI/CD pipeline is minimal but functional:  
 - **Workflow**:  
-  - Merging to the `stable` branch triggers deployment to the cluster.  
+  - Merging to the `release/dev` branch triggers deployment to the dev cluster.  
+  - Merging to the `release/prod` branch triggers deployment to the prod cluster.  
   - Other branches and git references run tests only.  
 
 ### Potential Improvements ###
